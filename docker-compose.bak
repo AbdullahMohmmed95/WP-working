@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  wordpress:
+    container_name: wordpress
+    image: wordpress:php8.1-apache
+    restart: always
+    stdin_open: true
+    tty: true
+    ports:
+     - 8082:80
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_USER: admin
+      WORDPRESS_DB_PASSWORD: P@ssw0rd
+      WORDPRESS_DB_NAME: WP
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./wordpress:/var/www/html
+  mariadb:
+    container_name: mariadb
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_DATABASE: WP
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: P@ssw0rd
+      MYSQL_RANDOM_ROOT_PASSWORD: P@ssw0rd
+    volumes:
+      - db_data:/var/lib/mysql
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - 8081:80
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/nginx/ssl
+      - ./certbot/data:/var/www/html
+volumes:
+  db_data: null
+  wordpress_data: null
+
